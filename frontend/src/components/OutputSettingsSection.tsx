@@ -1,3 +1,4 @@
+import { GeneratedCodeConfig } from "../types";
 import {
   Select,
   SelectContent,
@@ -5,7 +6,6 @@ import {
   SelectItem,
   SelectTrigger,
 } from "./ui/select";
-import { GeneratedCodeConfig } from "../types";
 
 function generateDisplayComponent(config: GeneratedCodeConfig) {
   switch (config) {
@@ -34,6 +34,13 @@ function generateDisplayComponent(config: GeneratedCodeConfig) {
         <div>
           <span className="font-semibold">Ionic</span> +{" "}
           <span className="font-semibold">Tailwind</span>
+        </div>
+      );
+    case GeneratedCodeConfig.REACT_MUI_COMPONENT:
+      return (
+        <div>
+          <span className="font-semibold">React</span> +{" "}
+          <span className="font-semibold">MUI</span>
         </div>
       );
     default:
@@ -80,6 +87,11 @@ function OutputSettingsSection({
               </SelectItem>
               <SelectItem value={GeneratedCodeConfig.IONIC_TAILWIND}>
                 {generateDisplayComponent(GeneratedCodeConfig.IONIC_TAILWIND)}
+              </SelectItem>
+              <SelectItem value={GeneratedCodeConfig.REACT_MUI_COMPONENT}>
+                {generateDisplayComponent(
+                  GeneratedCodeConfig.REACT_MUI_COMPONENT
+                )}
               </SelectItem>
             </SelectGroup>
           </SelectContent>

@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import { WS_BACKEND_URL } from "./config";
+import { HTTP_BACKEND_URL, WS_BACKEND_URL } from "./config";
 import { USER_CLOSE_WEB_SOCKET_CODE } from "./constants";
 import { FullGenerationSettings } from "./types";
 
@@ -8,7 +8,7 @@ const ERROR_MESSAGE =
 
 const STOP_MESSAGE = "Code generation stopped";
 
-export function generateCode(
+export function generateCodeWebSocket(
   wsRef: React.MutableRefObject<WebSocket | null>,
   params: FullGenerationSettings,
   onChange: (chunk: string) => void,
@@ -54,4 +54,27 @@ export function generateCode(
     console.error("WebSocket error", error);
     toast.error(ERROR_MESSAGE);
   });
+}
+
+export async function generateCodeHttp(params: FullGenerationSettings) {
+  const generationUrl = `${HTTP_BACKEND_URL}/api/generate-code`;
+  console.log("Generating code @ ", generationUrl);
+  try {
+    const response = await fetch(generationUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(params),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (e) {
+    console.error("Fetching generated code failed:", e);
+    throw e;
+  }
 }
