@@ -27,8 +27,5 @@ export default ({ mode }) => {
         "@": path.resolve(__dirname, "./src"),
       },
     },
-    optimizeDeps: {
-      disabled: process.env.NODE_ENV === "development",
-    },
   });
 };

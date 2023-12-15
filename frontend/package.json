@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "NODE_ENV=development vite",
     "dev-hosted": "vite --mode prod",
     "build": "tsc && vite build",
     "build-hosted": "tsc && vite build --mode prod",
@@ -63,7 +63,7 @@
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5",
     "typescript": "^5.0.2",
-    "vite": "^4.4.5",
+    "vite": "^5.0.8",
     "vite-plugin-html": "^3.2.0",
     "vitest": "^1.0.1"
   },
