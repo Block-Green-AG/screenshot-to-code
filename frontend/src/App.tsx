@@ -1,5 +1,9 @@
-import classNames from "classnames";
 import { useEffect, useRef, useState } from "react";
+import ImageUpload from "./components/ImageUpload";
+import CodePreview from "./components/CodePreview";
+import Preview from "./components/Preview";
+import Spinner from "./components/Spinner";
+import classNames from "classnames";
 import {
   FaCode,
   FaDesktop,
@@ -7,32 +11,14 @@ import {
   FaMobile,
   FaUndo,
 } from "react-icons/fa";
-import CodePreview from "./components/CodePreview";
-import ImageUpload from "./components/ImageUpload";
-import Preview from "./components/Preview";
-import Spinner from "./components/Spinner";
 import { generateCodeHttp, generateCodeWebSocket } from "./generateCode";
 
+import { Switch } from "./components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import html2canvas from "html2canvas";
-import toast from "react-hot-toast";
-import CodeTab from "./components/CodeTab";
 import ComponentPreview from "./components/ComponentPreview";
-import { OnboardingNote } from "./components/OnboardingNote";
-import OutputSettingsSection from "./components/OutputSettingsSection";
-import { PicoBadge } from "./components/PicoBadge";
-import SettingsDialog from "./components/SettingsDialog";
-import TermsOfServiceDialog from "./components/TermsOfServiceDialog";
-import { UrlInputSection } from "./components/UrlInputSection";
-import HistoryDisplay from "./components/history/HistoryDisplay";
-import { History } from "./components/history/history_types";
-import { extractHistoryTree } from "./components/history/utils";
-import { Switch } from "./components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
-import { IS_RUNNING_ON_CLOUD } from "./config";
-import { USER_CLOSE_WEB_SOCKET_CODE } from "./constants";
-import { usePersistedState } from "./hooks/usePersistedState";
+import SettingsDialog from "./components/SettingsDialog";
 import {
   AppState,
   CodeGenerationParams,
@@ -40,6 +26,20 @@ import {
   GeneratedCodeConfig,
   Settings,
 } from "./types";
+import { IS_RUNNING_ON_CLOUD } from "./config";
+import { PicoBadge } from "./components/PicoBadge";
+import { OnboardingNote } from "./components/OnboardingNote";
+import { usePersistedState } from "./hooks/usePersistedState";
+import { UrlInputSection } from "./components/UrlInputSection";
+import TermsOfServiceDialog from "./components/TermsOfServiceDialog";
+import html2canvas from "html2canvas";
+import { USER_CLOSE_WEB_SOCKET_CODE } from "./constants";
+import CodeTab from "./components/CodeTab";
+import OutputSettingsSection from "./components/OutputSettingsSection";
+import { History } from "./components/history/history_types";
+import HistoryDisplay from "./components/history/HistoryDisplay";
+import { extractHistoryTree } from "./components/history/utils";
+import toast from "react-hot-toast";
 
 const IS_OPENAI_DOWN = false;
 
