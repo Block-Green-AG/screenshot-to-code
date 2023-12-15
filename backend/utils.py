@@ -48,3 +48,31 @@ def write_logs(prompt_messages, completion):
     # Write the messages dict into a new file for each run
     with open(filename, "w") as f:
         f.write(json.dumps({"prompt": prompt_messages, "completion": completion}))
+
+def extract_source_code(markdown_text):
+    """
+    Extracts the source code from a markdown string.
+
+    :param markdown_text: A string that contains markdown text
+    :return: The extracted source code
+    """
+    # Splitting the markdown text into lines
+    lines = markdown_text.split('\n')
+
+    # Checking if the markdown contains code blocks
+    if any('```' in line for line in lines):
+        code = []
+        code_block = False
+        for line in lines:
+            if line.startswith('```'):
+                # Toggle the code block flag
+                code_block = not code_block
+                # Skip the line that only contains '```'
+                continue
+            if code_block:
+                code.append(line)
+        return '\n'.join(code)
+    else:
+        # If there are no code blocks, the entire text is considered as code
+        return markdown_text
+

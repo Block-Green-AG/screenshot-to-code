@@ -129,9 +129,8 @@ padding, margin, border, etc. Match the colors and sizes as exactly.
 - For images, use placeholder images from https://placehold.co and include a detailed description of the image in the alt text so that an image generation AI can generate the image later.
 
 
-In terms of libraries, imports from any of the following libraries may be used:
+In terms of libraries, imports from any of the following libraries may be used if necessary:
 
-- react
 - react-dom
 - @mui/material
 - @mui/icons-material
@@ -146,7 +145,7 @@ In terms of libraries, imports from any of the following libraries may be used:
 - Structure the code within a React functional component format, and include necessary hooks or state management techniques if required for the component's functionality.
 
 Return only the full code of the component, starting with imports.
-Do not include markdown "```" or "```tsx" at the start or end.
+DO NOT include markdown "```" or "```tsx" at the start or end.
 """
 
 USER_PROMPT = """

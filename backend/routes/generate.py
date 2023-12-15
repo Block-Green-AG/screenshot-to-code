@@ -2,6 +2,7 @@
 import base64
 import json
 import os
+import shutil
 import traceback
 from datetime import datetime
 from typing import List, Optional
@@ -13,7 +14,7 @@ from llm import stream_openai_response
 from mock import mock_completion
 from prompts import assemble_prompt
 from pydantic import BaseModel
-from utils import write_logs
+from utils import extract_source_code, write_logs
 
 # Useful for debugging purposes when you don't want to waste GPT4-Vision credits
 # Setting to True will stream a mock response instead of calling the OpenAI API
@@ -23,6 +24,10 @@ SHOULD_MOCK_AI_RESPONSE = bool(os.environ.get("MOCK", False))
 # Set to True when running in production (on the hosted version)
 # Used as a feature flag to enable or disable certain features
 IS_PROD = os.environ.get("IS_PROD", False)
+
+FRONTEND_FILE_PATH = "../frontend/src/components/GeneratedComponent.tsx"
+LOADING_FILE_PATH = "../frontend/src/components/LoadingComponent.tsx"
+
 
 class GenerateCodeRequest(BaseModel):
     generationType: str;
@@ -44,6 +49,7 @@ class GenerateCodeResponse(BaseModel):
 
 async def generate_code(request: GenerateCodeRequest):
     print("Generating code...")
+    shutil.copyfile(LOADING_FILE_PATH, FRONTEND_FILE_PATH)
 
     # Read the code config settings from the request. Fall back to default if not provided.
     generated_code_config = ""
@@ -166,6 +172,8 @@ async def generate_code(request: GenerateCodeRequest):
     # Write the messages dict into a log so that we can debug later
     write_logs(prompt_messages, completion)
 
+    completion = extract_source_code(completion)
+
     try:
         if should_generate_images:
             updated_html = await generate_images(
@@ -176,8 +184,14 @@ async def generate_code(request: GenerateCodeRequest):
             )
         else:
             updated_html = completion
-        return GenerateCodeResponse(code=updated_html)
     except Exception as e:
         traceback.print_exc()
         print("Image generation failed", e)
         raise Exception("Image generation failed but code is complete.")
+
+
+    # Write the content of updated_html to GeneratedComponent.tsx
+    with open(FRONTEND_FILE_PATH, "w") as file:
+        file.write(updated_html)
+
+    return GenerateCodeResponse(code=updated_html)
