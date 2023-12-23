@@ -1,14 +1,12 @@
 import base64
-from fastapi import APIRouter
-from pydantic import BaseModel
-import httpx
+from typing import Optional
 
-router = APIRouter()
+import httpx
 
 
 def bytes_to_data_url(image_bytes: bytes, mime_type: str) -> str:
     base64_image = base64.b64encode(image_bytes).decode("utf-8")
-    return f"data:{mime_type};base64,{base64_image}"
+    return f"data:{mime_type}base64,{base64_image}"
 
 
 async def capture_screenshot(target_url, api_key, device="desktop") -> bytes:
@@ -38,27 +36,3 @@ async def capture_screenshot(target_url, api_key, device="desktop") -> bytes:
             return response.content
         else:
             raise Exception("Error taking screenshot")
-
-
-class ScreenshotRequest(BaseModel):
-    url: str
-    apiKey: str
-
-
-class ScreenshotResponse(BaseModel):
-    url: str
-
-
-@router.post("/api/screenshot")
-async def app_screenshot(request: ScreenshotRequest):
-    # Extract the URL from the request body
-    url = request.url
-    api_key = request.apiKey
-
-    # TODO: Add error handling
-    image_bytes = await capture_screenshot(url, api_key=api_key)
-
-    # Convert the image bytes to a data url
-    data_url = bytes_to_data_url(image_bytes, "image/png")
-
-    return ScreenshotResponse(url=data_url)

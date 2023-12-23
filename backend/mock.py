@@ -5,7 +5,8 @@ async def mock_completion(process_chunk):
     code_to_return = NO_IMAGES_NYTIMES_MOCK_CODE
 
     for i in range(0, len(code_to_return), 10):
-        await process_chunk(code_to_return[i : i + 10])
+        if (process_chunk):
+            await process_chunk(code_to_return[i : i + 10])
         await asyncio.sleep(0.01)
 
     return code_to_return

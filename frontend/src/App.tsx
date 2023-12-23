@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import ImageUpload from "./components/ImageUpload";
 import CodePreview from "./components/CodePreview";
 import Preview from "./components/Preview";
-import { generateCode } from "./generateCode";
 import Spinner from "./components/Spinner";
 import classNames from "classnames";
 import {
@@ -12,10 +11,12 @@ import {
   FaMobile,
   FaUndo,
 } from "react-icons/fa";
+import { generateCodeHttp, generateCodeWebSocket } from "./generateCode";
 
 import { Switch } from "./components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import ComponentPreview from "./components/ComponentPreview";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import SettingsDialog from "./components/SettingsDialog";
 import {
@@ -142,53 +143,69 @@ function App() {
     // Merge settings with params
     const updatedParams = { ...params, ...settings };
 
-    generateCode(
-      wsRef,
-      updatedParams,
-      (token) => setGeneratedCode((prev) => prev + token),
-      (code) => {
-        setGeneratedCode(code);
-        if (params.generationType === "create") {
-          setAppHistory([
-            {
-              type: "ai_create",
-              parentIndex: null,
-              code,
-              inputs: { image_url: referenceImages[0] },
-            },
-          ]);
-          setCurrentVersion(0);
-        } else {
-          setAppHistory((prev) => {
-            // Validate parent version
-            if (parentVersion === null) {
-              toast.error(
-                "No parent version set. Contact support or open a Github issue."
-              );
-              return prev;
-            }
-
-            const newHistory: History = [
-              ...prev,
+    if (
+      settings.generatedCodeConfig === GeneratedCodeConfig.REACT_MUI_COMPONENT
+    ) {
+      generateCodeHttp(updatedParams)
+        .then((data) => {
+          console.log("Code generation response", data);
+          setGeneratedCode(data.code);
+          setAppState(AppState.CODE_READY);
+        })
+        .catch((err) => {
+          console.error("Code generation error", err);
+          toast.error("Code generation failed. Please try again.");
+          setAppState(AppState.CODE_READY);
+        });
+    } else {
+      generateCodeWebSocket(
+        wsRef,
+        updatedParams,
+        (token) => setGeneratedCode((prev) => prev + token),
+        (code) => {
+          setGeneratedCode(code);
+          if (params.generationType === "create") {
+            setAppHistory([
               {
-                type: "ai_edit",
-                parentIndex: parentVersion,
+                type: "ai_create",
+                parentIndex: null,
                 code,
-                inputs: {
-                  prompt: updateInstruction,
-                },
+                inputs: { image_url: referenceImages[0] },
               },
-            ];
-            setCurrentVersion(newHistory.length - 1);
-            return newHistory;
-          });
+            ]);
+            setCurrentVersion(0);
+          } else {
+            setAppHistory((prev) => {
+              // Validate parent version
+              if (parentVersion === null) {
+                toast.error(
+                  "No parent version set. Contact support or open a Github issue."
+                );
+                return prev;
+              }
+
+              const newHistory: History = [
+                ...prev,
+                {
+                  type: "ai_edit",
+                  parentIndex: parentVersion,
+                  code,
+                  inputs: {
+                    prompt: updateInstruction,
+                  },
+                },
+              ];
+              setCurrentVersion(newHistory.length - 1);
+              return newHistory;
+            });
+          }
+        },
+        (line) => setExecutionConsole((prev) => [...prev, line]),
+        () => {
+          setAppState(AppState.CODE_READY);
         }
-      },
-      (line) => setExecutionConsole((prev) => [...prev, line]),
-      () => {
-        setAppState(AppState.CODE_READY);
-      }
-    );
+      );
+    }
   }
 
   // Initial version creation
@@ -444,10 +461,20 @@ function App() {
                 </TabsList>
               </div>
               <TabsContent value="desktop">
-                <Preview code={generatedCode} device="desktop" />
+                {settings.generatedCodeConfig ===
+                GeneratedCodeConfig.REACT_MUI_COMPONENT ? (
+                  <ComponentPreview device="desktop" />
+                ) : (
+                  <Preview code={generatedCode} device="desktop" />
+                )}
               </TabsContent>
               <TabsContent value="mobile">
-                <Preview code={generatedCode} device="mobile" />
+                {settings.generatedCodeConfig ===
+                GeneratedCodeConfig.REACT_MUI_COMPONENT ? (
+                  <ComponentPreview device="mobile" />
+                ) : (
+                  <Preview code={generatedCode} device="mobile" />
+                )}
               </TabsContent>
               <TabsContent value="code">
                 <CodeTab

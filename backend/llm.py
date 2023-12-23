@@ -1,5 +1,6 @@
 import os
-from typing import Awaitable, Callable
+from typing import Awaitable, Callable, Optional
+
 from openai import AsyncOpenAI
 
 MODEL_GPT_4_VISION = "gpt-4-vision-preview"
@@ -9,7 +10,7 @@ async def stream_openai_response(
     messages,
     api_key: str,
     base_url: str | None,
-    callback: Callable[[str], Awaitable[None]],
+    callback: Optional[Callable[[str], Awaitable[None]]] = None,
 ):
     client = AsyncOpenAI(api_key=api_key, base_url=base_url)
 
@@ -28,7 +29,8 @@ async def stream_openai_response(
     async for chunk in completion:
         content = chunk.choices[0].delta.content or ""
         full_response += content
-        await callback(content)
+        if (callback):
+            await callback(content)
 
     await client.close()
 

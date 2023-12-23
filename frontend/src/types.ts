@@ -9,6 +9,7 @@ export enum GeneratedCodeConfig {
   REACT_TAILWIND = "react_tailwind",
   BOOTSTRAP = "bootstrap",
   IONIC_TAILWIND = "ionic_tailwind",
+  REACT_MUI_COMPONENT = "react_mui_component",
 }
 
 export interface Settings {
